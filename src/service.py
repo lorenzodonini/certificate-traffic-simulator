@@ -4,11 +4,11 @@ class Service:
         self.service_id = service_id
         self.certificate = None
 
-    def is_certificate_valid(self):
-        return self.certificate and self.certificate.is_valid()
+    def is_certificate_valid(self, now):
+        return self.certificate and self.certificate.is_valid(now)
 
-    def run(self):
-        if not self.is_certificate_valid():
+    def run(self, now):
+        if not self.is_certificate_valid(now):
             raise PermissionError(str(self) + ' has invalid certificate')
         # Do some stuff
         pass
