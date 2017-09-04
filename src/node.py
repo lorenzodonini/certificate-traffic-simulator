@@ -1,10 +1,12 @@
+from src import network_manager
+
 # Node-Local Service Manager (NLSM)
 
 
 class Node:
     def __init__(self, node_id, slsm):
-        self.id = node_id
         self.slsm = slsm
+        self.id = slsm + ".NSLM" + str(node_id)
         self.services = {}  # <id, service>
 
     def __should_renew_certificate(self, service_id, now):
@@ -13,7 +15,7 @@ class Node:
 
     def deploy_service(self, new_service):
         if self.services[new_service.service_id]:
-            raise KeyError("Service is already deployed on the node")
+            raise KeyError("Service " + str(new_service) + " is already deployed on node " + str(self))
         self.services[new_service.service_id] = new_service
         self.renew_certificate(new_service)
 
@@ -23,12 +25,13 @@ class Node:
     def renew_certificate(self, service):
         certificate = self.slsm.renew_certificate(self, service)
         if not certificate:
-            raise ValueError("Cannot set empty certificate")
+            raise ValueError("Cannot set empty certificate for service " + str(service))
         service.certificate = certificate
 
     def run_services(self, now):
         for s in self.services:
             if not s.is_certificate_valid() or self.__should_renew_certificate(s.service_id, now):
+                network_manager.NetworkManager().generate_traffic(self.id, s.certificate.size)
                 self.renew_certificate(s)
             s.run(now)
 

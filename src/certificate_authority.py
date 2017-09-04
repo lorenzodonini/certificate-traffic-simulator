@@ -5,11 +5,12 @@ import random
 
 
 class CertificateAuthority:
-    def __init__(self, site_key, certificate_config):
+    def __init__(self, slsm_id, site_key, certificate_config):
         self.certificate_validity = certificate_config.validity
         self.certificate_expiration_backoff = certificate_config.expiration_backoff
         self.certificate_size = certificate_config.size
         self.site_key = site_key
+        self.id = str(slsm_id) + ".SLCA"
 
     def issue_certificate(self, node, service):
         random_backoff = random.randint(0, self.certificate_expiration_backoff)

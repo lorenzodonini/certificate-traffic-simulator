@@ -1,16 +1,21 @@
-from src import certificate_authority
-from src import certificate
+from src import certificate_authority, network_manager
 
 # Site-Local Service Manager (SLSM)
 
 
 class SmartSpace:
-    def __init__(self, space_id):
-        self.space_id = space_id
+    def __init__(self, space_id, certificate_config):
+        self.space_id = "SLSM" + str(space_id)
         self.nodes = []
+        self.slca = certificate_authority.CertificateAuthority(self.space_id, certificate_config)
 
     def add_node(self, node):
         self.nodes.append(node)
 
-    def renew_certificate(self, old_certificate):
-        pass
+    def renew_certificate(self, node, service):
+        if not node.is_service_running(service.service_id):
+            return None
+        new_certificate = self.slca.issue_certificate(node, service)
+        network_manager.NetworkManager().generate_traffic(self.slca.id, new_certificate.size)   # SLCA -> SLSM
+        network_manager.NetworkManager().generate_traffic(self.space_id, new_certificate.size)  # SLSM -> NLSM
+        return new_certificate
