@@ -1,11 +1,18 @@
 class Service:
-    def __init__(self, name):
+    def __init__(self, service_id, name):
         self.name = name
-        self.active = False
+        self.service_id = service_id
+        self.certificate = None
 
-    def activate(self):
-        self.active = True
+    def is_certificate_valid(self):
+        return self.certificate and self.certificate.is_valid()
 
-    def deactivate(self):
-        self.active = False
+    def run(self):
+        if not self.is_certificate_valid():
+            raise PermissionError(str(self) + ' has invalid certificate')
+        # Do some stuff
+        pass
+
+    def __str__(self):
+        return str(self.service_id) + ' - ' + str(self.name)
 
