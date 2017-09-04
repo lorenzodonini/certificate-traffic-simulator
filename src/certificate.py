@@ -1,20 +1,19 @@
-from datetime import datetime
-from datetime import timedelta
-
-
 class Certificate:
-    def __init__(self, service_id, duration=1000):
-        self.start_time = datetime.now()
-        self.duration = duration
-        self.id = ''
-        # self.signature = service_id + self.start_time
 
-    def __expiration_time__(self):
-        return self.start_time + timedelta(seconds=self.duration)
+    def __init__(self, node_id, service_id, signature_key, issue_time, validity=1000, size=256, expiration_backoff=100):
+        self.issue_time = issue_time
+        self.validity = validity
+        self.expiration_time = self.issue_time + self.validity - expiration_backoff
+        self.size = size
+        # This is only for simulation purposes. The actual certificate would be generated differently
+        self.signature = str(node_id) + '.' + str(service_id) + '.' + str(signature_key)
 
-    def is_valid(self):
-        return datetime.now() < self.__expiration_time__()
+    def is_expired(self, now):
+        return now >= self.expiration_time
+
+    def is_valid(self, now):
+        return now < (self.issue_time + self.validity)
 
     def __str__(self):
-        return self.id + " -> start: " + str(self.start_time) + ", end: " + str(self.__expiration_time__())
+        return self.signature + " -> start: " + str(self.issue_time) + ", end: " + str(self.expiration_time)
 

@@ -5,10 +5,10 @@ import random
 
 
 class CertificateAuthority:
-    def __init__(self, site_key, certificate_size=256, certificate_validity=1000, certificate_expiration_backoff=100):
-        self.certificate_validity = certificate_validity
-        self.certificate_expiration_backoff = certificate_expiration_backoff
-        self.certificate_size = certificate_size
+    def __init__(self, site_key, certificate_config):
+        self.certificate_validity = certificate_config.validity
+        self.certificate_expiration_backoff = certificate_config.expiration_backoff
+        self.certificate_size = certificate_config.size
         self.site_key = site_key
 
     def issue_certificate(self, node, service):
