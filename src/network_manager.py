@@ -20,7 +20,7 @@ class NetworkManager(metaclass=Singleton):
 
     def generate_traffic(self, source, amount):
         traffic = 0
-        if self.monitored_traffic[source]:
+        if source in self.monitored_traffic:
             traffic = self.monitored_traffic[source] + amount
         else:
             traffic += amount
