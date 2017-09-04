@@ -16,6 +16,8 @@ class NetworkManager(metaclass=Singleton):
         self.current_time = 0
 
     def total_generated_traffic(self):
+        if len(self.monitored_traffic) == 0:
+            return 0
         return reduce(lambda total, val: total+val, self.monitored_traffic.values())
 
     def generate_traffic(self, source, amount):
