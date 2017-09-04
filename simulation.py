@@ -55,12 +55,11 @@ class Simulation:
         if self.config.service_interval > 0 and (self.network_manager.current_time % self.config.service_interval) == 0:
             self.__instantiate_service__(n)
 
-    def __log_data__(self, space, traffic, total_traffic):
+    def __log_data__(self, space, total_services, traffic, total_traffic):
         if self.logger:
-            services = len(space.nodes[0].services) if len(space.nodes) > 0 else 0
             self.logger.log_data(self.network_manager.current_time,
                                  len(space.nodes),
-                                 services,
+                                 total_services,
                                  traffic,
                                  (total_traffic / self.network_manager.current_time))
 
@@ -73,13 +72,15 @@ class Simulation:
         print("Simulation started!")
         while self.__tick__():
             self.__update_nodes__(self.space)
+            total_services = 0
             for n in self.space.nodes:
                 self.__update_services__(n)
                 n.run_services()
+                total_services += len(n.services)
             # Update generated traffic
             total_traffic = self.network_manager.total_generated_traffic()
             traffic = total_traffic - traffic
-            self.__log_data__(self.space, traffic, total_traffic)
+            self.__log_data__(self.space, total_services, traffic, total_traffic)
             traffic = total_traffic
 
         print("Simulation ended")
