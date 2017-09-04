@@ -1,4 +1,4 @@
-from src import network_manager
+from model import network_manager
 
 # Node-Local Service Manager (NLSM)
 

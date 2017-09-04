@@ -1,4 +1,4 @@
-from src import certificate
+from model import certificate
 import random
 
 # Site-Local Certificate Authority (SLCA)

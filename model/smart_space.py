@@ -1,4 +1,4 @@
-from src import certificate_authority, network_manager
+from model import certificate_authority, network_manager
 
 # Site-Local Service Manager (SLSM)
 

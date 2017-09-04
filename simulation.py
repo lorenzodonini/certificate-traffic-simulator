@@ -1,6 +1,6 @@
-#!/usr/bin/python3
+#!/usr/local/bin/python3
 
-from src import node, service, data_manager, network_manager, smart_space
+from model import node, service, data_manager, network_manager, smart_space
 from sys import argv
 import argparse
 
