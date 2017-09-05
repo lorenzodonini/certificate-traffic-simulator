@@ -11,6 +11,7 @@ class Simulation:
         self.config = args
         self.space = None
         self.sim_duration = args.duration
+        self.hide_idle_ticks = args.hide
         self.logger = data_manager.DataManager(args.output)
         certificate_config = {'validity': args.certificate_validity,
                               'expiration_backoff': args.certificate_renew_backoff,
@@ -58,6 +59,8 @@ class Simulation:
 
     def __log_data__(self, space, total_services, traffic, total_traffic):
         if self.logger:
+            if self.hide_idle_ticks and traffic == 0:
+                return
             self.logger.log_data(self.network_manager.current_time,
                                  len(space.nodes),
                                  total_services,
@@ -103,7 +106,8 @@ def parse_args():
     parser.add_argument('-cs', '--cert-size', help="Certificate size in bytes", type=int, default=734, dest='certificate_size')
     parser.add_argument('-cp', '--cert-request-payload', help="Payload size of a certificate renewal request", type=int, default=256, dest='certificate_request')
     parser.add_argument('-d', '--duration', help="Total duration of simulation in seconds", type=int, default=20000, dest='duration')
-    parser.add_argument('-o', '--output-file', help="Path of the output file on which the data should be saved in csv format", type=str, default="sim_output.csv", dest='output')
+    parser.add_argument('-o', '--out', help="Path of the output file on which the data should be saved in csv format", type=str, default="sim_output.csv", dest='output')
+    parser.add_argument('-i', '--hide-idle', help="Hides moments in time with no activity, only logging the ones with active traffic", type=bool, default=False, dest='hide')
 
     args = argv[1:]
     args = parser.parse_args(args)
