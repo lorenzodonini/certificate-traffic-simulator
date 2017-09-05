@@ -32,7 +32,6 @@ class Node:
         now = network_manager.NetworkManager().current_time
         for s in self.services.values():
             if not s.is_certificate_valid(now) or self.__should_renew_certificate(s.service_id, now):
-                network_manager.NetworkManager().generate_traffic(self.id, s.certificate.size)
                 self.renew_certificate(s)
             s.run(now)
 

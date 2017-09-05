@@ -14,6 +14,7 @@ class Simulation:
         self.logger = data_manager.DataManager(args.output)
         certificate_config = {'validity': args.certificate_validity,
                               'expiration_backoff': args.certificate_renew_backoff,
+                              'request': args.certificate_request,
                               'size': args.certificate_size}
         self.__setup__(certificate_config)
 
@@ -94,13 +95,14 @@ def main(args):
 def parse_args():
     parser = argparse.ArgumentParser(description='Parse simulation parameters')
     parser.add_argument('-n', '--nodes', help="Amount of nodes used for the simulation", type=int, default=50, dest='nodes')
-    parser.add_argument('-ni', '--node-interval', help="Interval in minutes between the spawning of a node and the next one", type=int, default=0, dest='node_interval')
+    parser.add_argument('-ni', '--node-interval', help="Interval in seconds between the spawning of a node and the next one", type=int, default=0, dest='node_interval')
     parser.add_argument('-s', '--services', help="Amount of services per node for the simulation", type=int, default=20, dest='services')
-    parser.add_argument('-si', '--service-interval', help="Interval in minutes between the spawning of a service and the next one", type=int, default=0, dest='service_interval')
-    parser.add_argument('-cv', '--cert-validity', help="Certificate validity in minutes", type=int, default=1000, dest='certificate_validity')
-    parser.add_argument('-cr', '--cert-renew-backoff', help="Max renewal backoff time before certificate expiration in minutes", type=int, default=200, dest='certificate_renew_backoff')
-    parser.add_argument('-cs', '--cert-size', help="Certificate size in bytes", type=int, default=256, dest='certificate_size')
-    parser.add_argument('-d', '--duration', help="Total duration of simulation in minutes", type=int, default=20000, dest='duration')
+    parser.add_argument('-si', '--service-interval', help="Interval in seconds between the spawning of a service and the next one", type=int, default=0, dest='service_interval')
+    parser.add_argument('-cv', '--cert-validity', help="Certificate validity in seconds", type=int, default=1000, dest='certificate_validity')
+    parser.add_argument('-cr', '--cert-renew-backoff', help="Max renewal backoff time before certificate expiration in seconds", type=int, default=200, dest='certificate_renew_backoff')
+    parser.add_argument('-cs', '--cert-size', help="Certificate size in bytes", type=int, default=734, dest='certificate_size')
+    parser.add_argument('-cp', '--cert-request-payload', help="Payload size of a certificate renewal request", type=int, default=256, dest='certificate_request')
+    parser.add_argument('-d', '--duration', help="Total duration of simulation in seconds", type=int, default=20000, dest='duration')
     parser.add_argument('-o', '--output-file', help="Path of the output file on which the data should be saved in csv format", type=str, default="sim_output.csv", dest='output')
 
     args = argv[1:]
