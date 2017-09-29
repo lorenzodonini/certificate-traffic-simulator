@@ -7,6 +7,7 @@ from model.node import Node
 from model.service import Service
 from sys import argv
 import argparse
+import random
 
 
 class Simulation:
@@ -17,6 +18,7 @@ class Simulation:
         self.sim_duration = args.duration
         self.hide_idle_ticks = args.hide
         self.logger = DataManager(args.output)
+        self.offline_nodes = {}
         certificate_config = {'validity': args.certificate_validity,
                               'expiration_backoff': args.certificate_renew_backoff,
                               'request': args.certificate_request,
@@ -58,15 +60,26 @@ class Simulation:
                 raise ValueError("Cannot set empty certificate for service " + str(s))
             s.certificate = certificate
         # Deploy service on node
-        n.deploy_service(s)
+        n.deploy_service(s, self.network_manager.current_time)
 
     def __update_nodes__(self, space):
+        for n_id, (n, reboot_time) in list(self.offline_nodes.items()):
+            if network_manager.NetworkManager().current_time >= reboot_time:
+                n.available = True
+                del self.offline_nodes[n_id]
         if self.config.node_interval > 0 and (self.network_manager.current_time % self.config.node_interval) == 0:
             self.__instantiate_node__(space)
 
     def __update_services__(self, n):
         if self.config.service_interval > 0 and (self.network_manager.current_time % self.config.service_interval) == 0:
             self.__instantiate_service__(n)
+
+    def __handle_churn__(self, n):
+        # Randomly cause node churn
+        if n.id not in self.offline_nodes and random.randint(0, self.config.duration) <= self.config.duration - (
+                self.config.duration / 100 * self.config.node_availability):
+            n.available = False
+            self.offline_nodes[n.id] = (n, self.network_manager.current_time + random.randint(1, self.config.churn_time))
 
     def __log_data__(self, space, total_services, traffic, total_traffic):
         if self.logger:
@@ -89,6 +102,7 @@ class Simulation:
             self.__update_nodes__(self.space)
             total_services = 0
             for n in self.space.nodes:
+                self.__handle_churn__(n)
                 self.__update_services__(n)
                 n.run_services()
                 total_services += len(n.services)
@@ -110,6 +124,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Parse simulation parameters')
     parser.add_argument('-n', '--nodes', help="Amount of nodes used for the simulation", type=int, default=50, dest='nodes')
     parser.add_argument('-ni', '--node-interval', help="Interval in seconds between the spawning of a node and the next one", type=int, default=0, dest='node_interval')
+    parser.add_argument('-na', '--node-availability', help="Percentage availability of a node", type=float, default=99.999, dest='node_availability')
+    parser.add_argument('-nc', '--node-churn-time', help="Maximum churn time of a node", type=int, default=1000, dest="churn_time")
     parser.add_argument('-s', '--services', help="Amount of services per node for the simulation", type=int, default=20, dest='services')
     parser.add_argument('-si', '--service-interval', help="Interval in seconds between the spawning of a service and the next one", type=int, default=0, dest='service_interval')
     parser.add_argument('-cv', '--cert-validity', help="Certificate validity in seconds", type=int, default=1000, dest='certificate_validity')
