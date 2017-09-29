@@ -1,6 +1,10 @@
 #!/usr/local/bin/python3
 
-from model import node, service, data_manager, network_manager, smart_space
+from model import network_manager
+from model.data_manager import DataManager
+from model.smart_space import SmartSpace
+from model.node import Node
+from model.service import Service
 from sys import argv
 import argparse
 
@@ -12,7 +16,7 @@ class Simulation:
         self.space = None
         self.sim_duration = args.duration
         self.hide_idle_ticks = args.hide
-        self.logger = data_manager.DataManager(args.output)
+        self.logger = DataManager(args.output)
         certificate_config = {'validity': args.certificate_validity,
                               'expiration_backoff': args.certificate_renew_backoff,
                               'request': args.certificate_request,
@@ -20,7 +24,7 @@ class Simulation:
         self.__setup__(certificate_config)
 
     def __setup__(self, certificate_config):
-        self.space = smart_space.SmartSpace(0, certificate_config)
+        self.space = SmartSpace(0, certificate_config)
         if self.config.node_interval == 0:
             # Instantiate all nodes
             for j in range(0, self.config.nodes):
@@ -36,17 +40,24 @@ class Simulation:
     def __instantiate_node__(self, space):
         if len(space.nodes) >= self.config.nodes:
             return
-        n = node.Node(len(space.nodes), space)
+        n = Node(len(space.nodes), space)
         space.add_node(n)
         if self.config.service_interval == 0:
             # Instantiate all services for this node
             for k in range(0, self.config.services):
-                self.__instantiate_service__(n)
+                self.__instantiate_service__(n, True)
 
-    def __instantiate_service__(self, n):
+    def __instantiate_service__(self, n, initial_certificate=False):
         if len(n.services) >= self.config.services:
             return
-        s = service.Service(len(n.services), 'Service' + str(len(n.services)))
+        s = Service(len(n.services), 'Service' + str(len(n.services)))
+        if initial_certificate:
+            # Generate initial certificate
+            certificate = self.space.slca.issue_certificate(n, s, network_manager.NetworkManager().current_time)
+            if not certificate:
+                raise ValueError("Cannot set empty certificate for service " + str(s))
+            s.certificate = certificate
+        # Deploy service on node
         n.deploy_service(s)
 
     def __update_nodes__(self, space):
@@ -104,10 +115,11 @@ def parse_args():
     parser.add_argument('-cv', '--cert-validity', help="Certificate validity in seconds", type=int, default=1000, dest='certificate_validity')
     parser.add_argument('-cr', '--cert-renew-backoff', help="Max renewal backoff time before certificate expiration in seconds", type=int, default=200, dest='certificate_renew_backoff')
     parser.add_argument('-cs', '--cert-size', help="Certificate size in bytes", type=int, default=734, dest='certificate_size')
-    parser.add_argument('-cp', '--cert-request-payload', help="Payload size of a certificate renewal request", type=int, default=256, dest='certificate_request')
-    parser.add_argument('-d', '--duration', help="Total duration of simulation in seconds", type=int, default=20000, dest='duration')
+    parser.add_argument('-cp', '--cert-request-payload', help="Payload size of a certificate renewal request for a single group", type=int, default=200, dest='certificate_request')
+    parser.add_argument('-cg', '--cert-request-groups', help="Maximum amount of groups that a service on a node belongs to", type=int, default=5, dest='certificate_groups')
+    parser.add_argument('-d', '--duration', help="Total duration of simulation in seconds", type=int, default=100000, dest='duration')
     parser.add_argument('-o', '--out', help="Path of the output file on which the data should be saved in csv format", type=str, default="sim_output.csv", dest='output')
-    parser.add_argument('-i', '--hide-idle', help="Hides moments in time with no activity, only logging the ones with active traffic", type=bool, default=False, dest='hide')
+    parser.add_argument('-i', '--hide-idle', help="Hides moments in time with no activity, only logging the ones with active traffic", type=bool, default=True, dest='hide')
 
     args = argv[1:]
     args = parser.parse_args(args)

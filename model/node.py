@@ -17,7 +17,8 @@ class Node:
         if new_service.service_id in self.services:
             raise KeyError("Service " + str(new_service) + " is already deployed on node " + str(self))
         self.services[new_service.service_id] = new_service
-        self.renew_certificate(new_service)
+        if new_service.certificate.is_expired():
+            self.renew_certificate(new_service)
 
     def is_service_running(self, service_id):
         return self.services[service_id] is not None
