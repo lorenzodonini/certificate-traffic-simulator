@@ -15,7 +15,7 @@ rm certificate-traffic-simulator.zip;
 cd certificate-traffic-simulator;
 ./lifetime-sim.sh"
 
-ssh -f pc1.r "chmod +x certificate-traffic-simulator.zip;
+ssh -f pc2.r "chmod +x certificate-traffic-simulator.zip;
 rm -rf certificate-traffic-simulator/
 unzip certificate-traffic-simulator.zip;
 rm certificate-traffic-simulator.zip;
