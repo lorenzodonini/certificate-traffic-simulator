@@ -20,6 +20,7 @@ class Simulation:
         self.logger = DataManager(args.output)
         self.offline_nodes = {}
         certificate_config = {'validity': args.certificate_validity,
+                              'access_groups': args.access_groups,
                               'expiration_backoff': args.certificate_renew_backoff,
                               'request': args.certificate_request,
                               'size': args.certificate_size}
@@ -132,7 +133,7 @@ def parse_args():
     parser.add_argument('-cr', '--cert-renew-backoff', help="Max renewal backoff time before certificate expiration in seconds", type=int, default=200, dest='certificate_renew_backoff')
     parser.add_argument('-cs', '--cert-size', help="Certificate size in bytes", type=int, default=734, dest='certificate_size')
     parser.add_argument('-cp', '--cert-request-payload', help="Payload size of a certificate renewal request for a single group", type=int, default=200, dest='certificate_request')
-    parser.add_argument('-cg', '--cert-request-groups', help="Maximum amount of groups that a service on a node belongs to", type=int, default=5, dest='certificate_groups')
+    parser.add_argument('-cg', '--cert-access-groups', help="Maximum amount of groups that a service on a node belongs to", type=int, default=4, dest='access_groups')
     parser.add_argument('-d', '--duration', help="Total duration of simulation in seconds", type=int, default=100000, dest='duration')
     parser.add_argument('-o', '--out', help="Path of the output file on which the data should be saved in csv format", type=str, default="sim_output.csv", dest='output')
     parser.add_argument('-i', '--hide-idle', help="Hides moments in time with no activity, only logging the ones with active traffic", type=bool, default=True, dest='hide')
