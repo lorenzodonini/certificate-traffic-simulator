@@ -90,7 +90,8 @@ class Simulation:
                                  len(space.nodes),
                                  total_services,
                                  traffic,
-                                 (total_traffic / self.network_manager.current_time))
+                                 (total_traffic / self.network_manager.current_time),
+                                 self.config.certificate_validity)
 
     def run(self):
         if not self.space:
