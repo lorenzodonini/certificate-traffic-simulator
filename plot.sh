@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUT="$1".png
+OUT="$1".pdf
 
 TITLE="Certificate Renewal Traffic"
 if [ "$2" == "-r" ]; then
@@ -9,11 +9,17 @@ fi
 
 
 gnuplot << eor
-set terminal png size 1920,1080
+set terminal pdf
 set output "$OUT"
 #set style data linespoints
 set datafile separator ","
-set xlabel "Time (seconds)"
-set ylabel "Traffic (bytes)"
-plot "$1" using 1:4 title "$TITLE"
+set pointsize 0.5
+set xlabel "Time (seconds)" font 'Helvetica, 18'
+set ylabel "Generated Traffic (Bytes)" font 'Helvetica, 18'
+set lmargin 12
+set rmargin 5
+set bmargin 5
+set tics font 'Helvetica, 14'
+plot "$1" using 1:4 notitle
+#plot "$1" using 1:4 title "$TITLE"
 eor
