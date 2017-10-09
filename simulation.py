@@ -20,9 +20,7 @@ class Simulation:
         self.logger = DataManager(args.output)
         self.offline_nodes = {}
         certificate_config = {'validity': args.certificate_validity,
-                              'access_groups': args.access_groups,
                               'expiration_backoff': args.certificate_renew_backoff,
-                              'request': args.certificate_request,
                               'size': args.certificate_size}
         self.__setup__(certificate_config)
 
@@ -53,7 +51,8 @@ class Simulation:
     def __instantiate_service__(self, n, initial_certificate=False):
         if len(n.services) >= self.config.services:
             return
-        s = Service(len(n.services), 'Service' + str(len(n.services)))
+        request_size = sum([random.randint(1, self.config.certificate_request) * x for x in range(1, random.randint(1, self.config.access_groups))])
+        s = Service(len(n.services), 'Service' + str(len(n.services)), request_size)
         if initial_certificate:
             # Generate initial certificate
             certificate = self.space.slca.issue_certificate(n, s, network_manager.NetworkManager().current_time)
@@ -77,7 +76,7 @@ class Simulation:
 
     def __handle_churn__(self, n):
         # Randomly cause node churn
-        if n.id not in self.offline_nodes and random.randint(0, self.config.duration) <= self.config.duration - (
+        if n.id not in self.offline_nodes and random.randint(1, self.config.duration) <= self.config.duration - (
                 self.config.duration / 100 * self.config.node_availability):
             n.available = False
             self.offline_nodes[n.id] = (n, self.network_manager.current_time + random.randint(1, self.config.churn_time))

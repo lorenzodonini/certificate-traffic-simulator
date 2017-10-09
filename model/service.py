@@ -1,7 +1,8 @@
 class Service:
-    def __init__(self, service_id, name):
+    def __init__(self, service_id, name, request_payload):
         self.name = name
         self.service_id = service_id
+        self.request_payload = request_payload
         self.certificate = None
 
     def is_certificate_valid(self, now):
