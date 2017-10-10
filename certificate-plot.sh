@@ -2,7 +2,7 @@
 
 gnuplot << eor
 set terminal pdf
-set output "output/full_certificate_lifetime.pdf"
+set output "$1.pdf"
 set style data linespoints
 set datafile separator ","
 set xlabel "Certificate Lifetime (seconds)" font 'Helvetica, 18'
@@ -11,5 +11,5 @@ set tics font 'Helvetica, 14'
 set lmargin 10
 set rmargin 5
 set bmargin 5
-plot "output/full_certificate_lifetime.csv" using 2:1 notitle
+plot "$1" using 2:1 notitle
 eor

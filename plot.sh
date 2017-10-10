@@ -15,10 +15,11 @@ set output "$OUT"
 set datafile separator ","
 set pointsize 0.5
 set xlabel "Time (seconds)" font 'Helvetica, 18'
-set ylabel "Generated Traffic (Bytes)" font 'Helvetica, 18'
+set ylabel "Traffic (Bytes)" font 'Helvetica, 18'
 set lmargin 12
 set rmargin 5
 set bmargin 5
+set yrange [0:35000]
 set tics font 'Helvetica, 14'
 plot "$1" using 1:4 notitle
 #plot "$1" using 1:4 title "$TITLE"
